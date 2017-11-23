@@ -56,6 +56,13 @@ PHPX_METHOD(myClass, pset) {
     _this.oSet("resource", "ResourceString", new String("hello world"));
 }
 
+PHPX_METHOD(myClass,argTest) {
+    for (int i = 0; i < args.count();i++){
+        cout << "para:" << args[i].toString() << endl;
+    }
+    retval = "argTest called";
+}
+
 //resource的ptr内容强转为stirng，然后删除
 //这里应该对resouce进行操作转换
 void string_dtor(zend_resource *res) {
@@ -79,6 +86,12 @@ PHPX_EXTENSION() {
     c->addMethod(PHPX_ME(myClass, pget));
     c->addMethod(PHPX_ME(myClass, pset));
     c->addMethod(PHPX_ME(myClass, getClassName), PUBLIC);
+    //argTest
+    ArgInfo *paramArgInfo = new ArgInfo(2);
+    paramArgInfo->add("p1");
+    paramArgInfo->add("p2");
+    c->addMethod(PHPX_ME(myClass, argTest), PUBLIC, paramArgInfo);
+
     extension->registerClass(c);
 
     extension->registerResource("ResourceString", string_dtor);

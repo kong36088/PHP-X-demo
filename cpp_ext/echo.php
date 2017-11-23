@@ -9,3 +9,4 @@ var_dump($o->pget());
 var_dump($o);
 var_dump(myClass::class);
 var_dump($o->getClassName()); //与myClass::class相同作用
+var_dump($o->argTest(1,2,3,"string",12.12));
