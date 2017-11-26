@@ -51,13 +51,11 @@ if (APPLE)
 endif ()
 
 #libary
-add_library(cpp_ext SHARED ${DIR_SRCS})
-target_link_libraries(cpp_ext phpx)
+add_library(queue SHARED ${DIR_SRCS})
+target_link_libraries(queue phpx)
 
 #修改名称
-set_target_properties(cpp_ext PROPERTIES PREFIX "")
-#set_target_properties(cpp_ext PROPERTIES OUTPUT_NAME "cpp_ext")
+set_target_properties(queue PROPERTIES PREFIX "")
 
 #install
-install(TARGETS cpp_ext DESTINATION ${PHP_EXTENSION_DIR})
-#install(FILES ${HEADER_FILES} DESTINATION include)
+install(TARGETS queue DESTINATION ${PHP_EXTENSION_DIR})
