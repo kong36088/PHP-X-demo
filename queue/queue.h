@@ -3,5 +3,6 @@
 
 #include "phpx.h"
 
+#include <iostream>
 
 #endif
