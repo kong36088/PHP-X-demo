@@ -12,7 +12,9 @@
 ## 安装使用
 
 ```bash
-cmake .
+mkdir build
+cd build
+cmake ..
 make && make install
 ```
 or 
