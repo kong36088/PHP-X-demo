@@ -3,7 +3,6 @@ project(cpp_ext)
 cmake_minimum_required(VERSION 2.8)
 aux_source_directory(. DIR_SRCS)
 file(GLOB_RECURSE HEADER_FILES include/*.h)
-
 set(CMAKE_BUILD_TYPE Debug)
 
 if (DEFINED PHP_CONFIG_DIR)
@@ -13,7 +12,8 @@ else()
 endif()
 
 #execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --includes
-#        RESULT_VARIABLE PHP_INCLUDE
+#        OUTPUT_VARIABLE PHP_INCLUDE
+#        OUTPUT_STRIP_TRAILING_WHITESPACE
 #        )
 
 execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --include-dir
@@ -35,12 +35,12 @@ execute_process(COMMAND ${PHP_CONFIG_DIR}php-config --extension-dir
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 
+message("PHP_INCLUDE: ${PHP_INCLUDE}")
 message("PHP_INCLUDE_DIR: ${PHP_INCLUDE_DIR}")
 message("PHP_EXTENSION_DIR: ${PHP_EXTENSION_DIR}")
 
 link_directories(${PHP_LDFLAGS})
 
-include_directories(include)
 include_directories(BEFORE ${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
@@ -52,10 +52,12 @@ endif ()
 
 #libary
 add_library(cpp_ext SHARED ${DIR_SRCS})
+target_link_libraries(cpp_ext phpx)
 
-SET_TARGET_PROPERTIES(cpp_ext PROPERTIES OUTPUT_NAME "cpp_ext")
+#修改名称
+set_target_properties(cpp_ext PROPERTIES PREFIX "")
+#set_target_properties(cpp_ext PROPERTIES OUTPUT_NAME "cpp_ext")
+
 #install
-#安装时候运行的东西
-install(CODE "MESSAGE(\"Are you run command using root user?\")")
 install(TARGETS cpp_ext DESTINATION ${PHP_EXTENSION_DIR})
 #install(FILES ${HEADER_FILES} DESTINATION include)
