@@ -6,7 +6,7 @@ using namespace std;
 #define DEFAULT_QUEUE_SIZE 64
 struct QueueObject{
     int start;
-    int last;
+    int end;
     int size;
     int eleNum;
     Variant *storage;
@@ -17,8 +17,8 @@ PHPX_METHOD(Queue,__construct){
 
     queue->storage = (Variant *)ecalloc(DEFAULT_QUEUE_SIZE, sizeof(Variant));
     queue->start = 0;
-    queue->last = 0;
-    queue->size = DEFAULT_QUEUE_SIZE;
+    queue->end = 0;
+    queue->size = DEFAULT_QUEUE_SIZE + 1;
     queue->eleNum = 0;
 
     _this.oSet("queue_ptr", "QueueResource", queue);
@@ -51,12 +51,23 @@ PHPX_METHOD(Queue,push){
     QueueObject *queue = _this.oGet <QueueObject>("queue_ptr", "QueueResource");
 
     //队列满
-    if((queue->last+1)%queue->size == queue->start){
+    if((queue->end+1)%queue->size == queue->start){
+        zend_error(E_USER_WARNING, "Queue is full, queue's max size is limited to %d", DEFAULT_QUEUE_SIZE);
         retval = false;
         return;
     }
-    queue->storage[queue->last] = args[0];
-    queue->last = queue->last % (queue->size - 1) + 1;
+    if(args[0].type()==IS_ARRAY){
+        Array arr(args[0]);
+        cout << '[';
+        for (auto it = arr.begin(); it != arr.end();it++){
+            cout << it.value().toString();
+        }
+        cout << ']' << endl;
+    }else{
+        cout << args[0].toString() << endl;
+    }
+    queue->storage[queue->end] = args[0];
+    queue->end = (queue->end + 1) % queue->size;
     queue->eleNum += 1;
 
     retval = true;
@@ -69,7 +80,7 @@ PHPX_METHOD(Queue,pull){
         retval = false;
         return;
     }
-    queue->start = (queue->start + 1) % (queue->size - 1);
+    queue->start = (queue->start + 1) % queue->size;
     queue->eleNum -= 1;
 
     retval = true;
@@ -83,6 +94,25 @@ PHPX_METHOD(Queue,first){
         return;
     }
     retval = queue->storage[queue->start];
+}
+
+PHPX_METHOD(Queue,traverse){
+    QueueObject *queue = _this.oGet <QueueObject>("queue_ptr", "QueueResource");
+
+    for (int s = queue->start; s != queue->end;s = (s+1)%queue->size){
+        if(queue->storage[s].type()==IS_ARRAY){
+            Array arr(queue->storage[s]);
+            cout << '[';
+            for (auto it = arr.begin(); it != arr.end();it++){
+                cout << it.value().toString() << ' ';
+            }
+            cout << "] ";
+        }else{
+            cout << queue->storage[s].toString() << ' ';
+
+        }
+    }
+    cout << endl;
 }
 
 PHPX_EXTENSION() {
@@ -100,6 +130,7 @@ PHPX_EXTENSION() {
         c->addMethod(PHPX_ME(Queue, push), PUBLIC, pushArgi);
         c->addMethod(PHPX_ME(Queue, pull));
         c->addMethod(PHPX_ME(Queue, first));
+        c->addMethod(PHPX_ME(Queue, traverse));
 
         extension->registerClass(c);
 
