@@ -24,9 +24,11 @@ PHPX_METHOD(Queue,__construct){
     _this.oSet("queue_ptr", "QueueResource", queue);
 }
 
+//destructor
 void queueDtor(zend_resource *res){
-    //QueueObject * qo = static_cast<QueueObject *>(res->ptr);
-    //delete qo;
+    QueueObject *qo = static_cast<QueueObject *>(res->ptr);
+    efree(qo->storage);
+    efree(qo);
 }
 
 PHPX_METHOD(Queue,count){
