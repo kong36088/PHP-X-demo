@@ -1,3 +1,5 @@
+#include "args_test.h"
+
 using namespace php;
 using namespace std;
 
