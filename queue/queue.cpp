@@ -12,6 +12,13 @@ struct QueueObject{
     Variant *storage;
 };
 
+//destructor
+void queueResDtor(zend_resource *res){
+    QueueObject *qo = static_cast<QueueObject *>(res->ptr);
+    efree(qo->storage);
+    efree(qo);
+}
+
 PHPX_METHOD(Queue,__construct){
     QueueObject *queue = (QueueObject *)emalloc(sizeof(QueueObject));
 
@@ -22,13 +29,6 @@ PHPX_METHOD(Queue,__construct){
     queue->eleNum = 0;
 
     _this.oSet("queue_ptr", "QueueResource", queue);
-}
-
-//destructor
-void queueDtor(zend_resource *res){
-    QueueObject *qo = static_cast<QueueObject *>(res->ptr);
-    efree(qo->storage);
-    efree(qo);
 }
 
 PHPX_METHOD(Queue,count){
@@ -136,11 +136,10 @@ PHPX_EXTENSION() {
 
         extension->registerClass(c);
 
-        extension->registerResource("QueueResource", queueDtor);
+        extension->registerResource("QueueResource", queueResDtor);
     };
 
     //extension->onShutdown = [extension]() noexcept {
-    //    cout << extension->name << "shutdown" << endl;
     //};
 
     //extension->onBeforeRequest = [extension]() noexcept {
@@ -151,7 +150,7 @@ PHPX_EXTENSION() {
     //    cout << extension->name << "afterRequest" << endl;
     //};
 
-    extension->info({"cpp_ext support", "enabled"},
+    extension->info({"queue support", "enabled"},
                     {
                         {"author", "Jiang Weilong"},
                         {"version", extension->version},
