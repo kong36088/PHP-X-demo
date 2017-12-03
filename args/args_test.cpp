@@ -8,10 +8,32 @@ using namespace std;
 //	ZEND_ARG_INFO(0, value)
 //ZEND_END_ARG_INFO()
 
-PHPX_METHOD(ArgsTest,noneArgs){
-    cout << "noneArgs() called" << endl;
+void printArgs(Args args){
+    cout << "Args: ";
+    for (unsigned int i = 0; i <args.count(); i++)
+    {
+        if (args[i].type() == IS_ARRAY)
+        {
+            Array arr(args[i]);
+            cout << '[';
+            for (auto it = arr.begin(); it != arr.end(); it++)
+            {
+                cout << it.value().toString();
+            }
+            cout << ']' << ' ';
+        }
+        else
+        {
+            cout << args[i].toString() << ' ';
+        }
+    }
+    cout << endl;
 }
 
+PHPX_METHOD(ArgsTest,noneArgs){
+    printArgs(args);
+    cout << "noneArgs() called" << endl;
+}
 
 PHPX_METHOD(ArgsTest,oneArgs){
     //这样去解析参数，如果参数不正确会得到一个warning错误
@@ -19,15 +41,20 @@ PHPX_METHOD(ArgsTest,oneArgs){
 	//	return;
 	//}
     //TODO 搞清楚args传入的方式
+    printArgs(args);
 
     cout << "oneArgs() called" << endl;
 }
 
 PHPX_METHOD(ArgsTest,twoArgs){
+    printArgs(args);
+
     cout << "twoArgs() called" << endl;
 }
 
 PHPX_METHOD(ArgsTest,threeArgs){
+    printArgs(args);
+
     cout << "threeArgs() called" << endl;
 }
 
