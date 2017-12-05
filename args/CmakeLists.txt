@@ -43,7 +43,7 @@ link_directories(${PHP_LDFLAGS})
 
 include_directories(BEFORE ${PHP_INCLUDE_DIR} ${PHP_INCLUDE_DIR}/Zend ${PHP_INCLUDE_DIR}/main ${PHP_INCLUDE_DIR}/TSRM ${PHP_INCLUDE_DIR}/ext ${PHP_INCLUDE_DIR}/ext/date/lib)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall ${PHP_INCLUDES}")
-set(CMAKE_CXX_FLAGS_DEBUG "-g3")
+#set(CMAKE_CXX_FLAGS_DEBUG "-g3")
 
 #苹果用户
 if (APPLE)

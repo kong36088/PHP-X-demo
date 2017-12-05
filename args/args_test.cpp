@@ -3,12 +3,7 @@
 using namespace php;
 using namespace std;
 
-//其实就是执行ArgInfo做的事情。给zend_internal_arg_info赋值
-//ZEND_BEGIN_ARG_INFO_EX(arginfo_args_test, 0, 0, 1)
-//	ZEND_ARG_INFO(0, value)
-//ZEND_END_ARG_INFO()
-
-void printArgs(Args args){
+void printArgs(Args &args){
     cout << "Args: ";
     for (unsigned int i = 0; i <args.count(); i++)
     {
@@ -36,11 +31,6 @@ PHPX_METHOD(ArgsTest,noneArgs){
 }
 
 PHPX_METHOD(ArgsTest,oneArgs){
-    //这样去解析参数，如果参数不正确会得到一个warning错误
-    //if (zend_parse_parameters(ZEND_CALL_NUM_ARGS(EG(current_execute_data)), "z", &value) == FAILURE) {
-	//	return;
-	//}
-    //TODO 搞清楚args传入的方式
     printArgs(args);
 
     cout << "oneArgs() called" << endl;
@@ -48,6 +38,11 @@ PHPX_METHOD(ArgsTest,oneArgs){
 
 PHPX_METHOD(ArgsTest,twoArgs){
     printArgs(args);
+    zval *v1, *v2;
+    zend_execute_data *ex_data = EG(current_execute_data);
+    if (zend_parse_parameters(ZEND_CALL_NUM_ARGS(ex_data), "zz", v1, v2) == FAILURE) {
+        return;
+	}
 
     cout << "twoArgs() called" << endl;
 }
@@ -63,15 +58,16 @@ PHPX_EXTENSION() {
 
     extension->onStart = [extension]() noexcept {
         Class *c = new Class("ArgsTest");
-        c->addMethod(PHPX_ME(ArgsTest, noneArgs), PUBLIC);
+        ArgInfo *nargi = new ArgInfo(0);
+        c->addMethod(PHPX_ME(ArgsTest, noneArgs), PUBLIC, nargi);
 
         ArgInfo *oargi = new ArgInfo(1);
-        oargi->add("para1");
+        oargi->add("para1", nullptr, 0, false, false);
         c->addMethod(PHPX_ME(ArgsTest, oneArgs), PUBLIC, oargi);
 
-        ArgInfo *targi = new ArgInfo(1);
-        targi->add("para1");
-        targi->add("para2", nullptr, 0, false, true);
+        ArgInfo *targi = new ArgInfo(2);
+        targi->add("para1", nullptr, 0, false, false);
+        targi->add("para2", nullptr, 0, false, false);
         c->addMethod(PHPX_ME(ArgsTest, twoArgs), PUBLIC, targi);
 
         ArgInfo *thargi = new ArgInfo(2);
