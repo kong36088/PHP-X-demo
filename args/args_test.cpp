@@ -27,13 +27,13 @@ void printArgs(Args &args){
 
 PHPX_METHOD(ArgsTest,noneArgs){
     printArgs(args);
-    cout << "noneArgs() called" << endl;
+    cout << "ArgsTest::noneArgs() called" << endl;
 }
 
 PHPX_METHOD(ArgsTest,oneArgs){
     printArgs(args);
 
-    cout << "oneArgs() called" << endl;
+    cout << "ArgsTest::oneArgs() called" << endl;
 }
 
 PHPX_METHOD(ArgsTest,twoArgs){
@@ -44,17 +44,36 @@ PHPX_METHOD(ArgsTest,twoArgs){
         return;
 	}
 
-    cout << "twoArgs() called" << endl;
+    cout << "ArgsTest::twoArgs() called" << endl;
 }
 
 PHPX_METHOD(ArgsTest,threeArgs){
     printArgs(args);
 
-    cout << "threeArgs() called" << endl;
+    cout << "ArgsTest::threeArgs() called" << endl;
+}
+
+PHPX_FUNCTION(fnTest1){
+    printArgs(args);
+
+    cout << "fnTest1() called" << endl;
+}
+
+PHPX_FUNCTION(fnTest2){
+    printArgs(args);
+
+    cout << "fnTest2() called" << endl;
 }
 
 PHPX_EXTENSION() {
     Extension *extension = new Extension("args_test", "0.0.1");
+
+    extension->registerFunction(PHPX_FN(fnTest1));
+
+    ArgInfo *fnt2argi = new ArgInfo(1);
+    fnt2argi->add("para1");
+    fnt2argi->add("para2");
+    extension->registerFunction(PHPX_FN(fnTest2), fnt2argi);
 
     extension->onStart = [extension]() noexcept {
         Class *c = new Class("ArgsTest");
@@ -75,9 +94,7 @@ PHPX_EXTENSION() {
         thargi->add("para2");
         thargi->add("para3");  //根据ArgInfo->required_num,会对参数是否允许为空进行自动标记
         c->addMethod(PHPX_ME(ArgsTest, threeArgs), PUBLIC, thargi);
-
         extension->registerClass(c);
-
     };
 
     //extension->onShutdown = [extension]() noexcept {
